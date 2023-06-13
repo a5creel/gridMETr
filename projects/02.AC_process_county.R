@@ -1,29 +1,17 @@
-#This script provides an example for one way to extract data from netcdf files
+# Goal: Do the second step of processing the gridmet data
+# Prior to this script you must run project_init.R and 01.___.R
+# Andie Creel modifying Jude Bayhams directory
+# Started June 13th, 2023
 
-
-
-##################################
-##################################
-#User-defined variables (use vector of string names or "." for wildcard):
-
-#Define folders (variables) to extract - 
-folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn","vs","th","pet","fm100","fm1000")
-#Define set of years 
-filter.years <- seq.int(1980,2022,1)
-##################################
-gridmetr_download(variables = folder.names,
-                  years = filter.years)
-
-#gridmetr_download_pdsi()
-##################################
-
+# -----------------------------------------------------------------------------
+# Get some intial stuff set up 
+# -----------------------------------------------------------------------------
 
 #All gridmet files are on the same grid of lat and lons so grabbing one
 file.names <- list.files("inputs/data",recursive = T,pattern = ".nc",full.names = T)
 
 #Open the connection to the netCDF file
 nc <- nc_open(file.names[1])
-
 
 #Extract lat and lon vectors
 nc_lat <- ncvar_get(nc = nc, varid = "lat")
@@ -37,9 +25,10 @@ nc.coords <- expand.grid(lon=nc_lon,lat=nc_lat) %>%
          cells=row_number())
 
 
-##############################################
-#Use GIS tools to aggregate data by chosen geography
-##############################################
+# -----------------------------------------------------------------------------
+# Use GIS tools to aggregate data by chosen geography
+# -----------------------------------------------------------------------------
+
 #Choose a projection to be used by all geographic files
 readin.proj=4326 #because it works with the lat and lons provided
 
@@ -57,7 +46,9 @@ bridge.county <- st_join(g.nc.coords,us_co,left=T) %>%
   st_set_geometry(NULL)
 
 
-#######################
+# -----------------------------------------------------------------------------
+# Something with setting up file structure
+# -----------------------------------------------------------------------------
 
 file.list <- expand.grid(folder.names,filter.years,stringsAsFactors = F) %>% 
   rename(var=Var1,year=Var2) %>%
@@ -70,8 +61,13 @@ file.list <- paste0("inputs/data/",file.list$var,"/",file.list$file.name)
 
 fy = file.list[1]
 
-#Begin loop over variables (folders)
-plan(multisession(workers = 15))
+# -----------------------------------------------------------------------------
+# Begin loop over variables (folders)
+# AC: need to have cache folder set up before this step
+# creates parquet files in cache
+# -----------------------------------------------------------------------------
+
+plan(multisession(workers = 4)) #AC: I changed this to 4 for my computer
 future_walk(
   file.list,
   function(fy){
@@ -118,31 +114,3 @@ future_walk(
     write_parquet(out,paste0(dir_name,"/",vname,"_",str_sub(fy,-7,-4),".parquet"))
     
   },.progress = T)
-
-
-
-# for.dale <- gridmet.county %>%
-#   mutate(quarter=quarter(date,with_year = T)) %>%
-#   group_by(county,quarter) %>%
-#   summarize(value=base::mean(value,na.rm=T)) 
-#   
-# write_csv(for.dale,
-#           path = str_c("_Rdata/pdsi_quarter_county_",min(yr.range),"-",max(yr.range),".csv"))
-# 
-# haven::write_dta(for.dale,
-#                  path = str_c("_Rdata/pdsi_quarter_county_",min(yr.range),"-",max(yr.range),".dta"))
-
-#######################################
-#Plot the data to see if fits intuition
-# us_st <- us_states(resolution = "low") %>% st_transform(readin.proj) %>% dplyr::filter(!(state_abbr %in% c("AK","HI","PR")))
-# g.rmin <- st_as_sf(nc.df, coords = c("lon","lat")) %>% st_set_crs(readin.proj)
-# #plot data in CA
-# test <- ggplot() +
-#   geom_sf(data = g.rmin %>% st_transform(5070),aes(color=value)) +
-#   geom_sf(data = us_st %>% st_transform(5070),color="white",fill=NA)
-# #scale_color_gradient(limits=c(0,20)) +
-# #labs(title="",caption="")
-# 
-# ggsave(filename = "temp.pdf",plot=test, width = 11, height = 9, units = "in")
-
-########################################

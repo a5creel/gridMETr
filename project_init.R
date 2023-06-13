@@ -31,15 +31,15 @@ conflict_prefer("between", "dplyr")
 #Loading project helper functions (all scripts within folder)
 run.script("functions")
 
-#load geographies
+# #load geographies
 load("inputs/_ref/geographies/geos.Rdata")
 ##########################################
-##########################################
-#Function to download the project data (on first run, google should prompt you to login with credentials)
-#if data folder doesn't exist, build data
-#get_data("url")
-
-if(!dir.exists("inputs"))  system("ln -s /RSTOR/shared_data/gridmet inputs")  #link to gridmet folders
-
-
-#folder.setup()
+# ##########################################
+# #Function to download the project data (on first run, google should prompt you to login with credentials)
+# #if data folder doesn't exist, build data
+# #get_data("url")
+# 
+# if(!dir.exists("inputs"))  system("ln -s /RSTOR/shared_data/gridmet inputs")  #link to gridmet folders
+# 
+# 
+# #folder.setup()

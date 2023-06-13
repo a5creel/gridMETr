@@ -12,16 +12,26 @@ gridmetr_download(variables = c("pdsi","erc"),
                   years = seq.int(2000,2002))
 ```
 
+## Andie's READ_ME
+
+Next steps: 
+
+- Download gridmet data from 2003 - 2022 for my variables (just need to run)
+- process (just need to run)
+- write to csvs (need to write to loop over years) 
 
 
 
-### ToDo
+
+
+### Jude's ToDo
 
 - Determine why future (parallel) fails within the download function
 
 - Determine steps to convert to package
 
 - Provide some visualization utilities
+
 
 
 
