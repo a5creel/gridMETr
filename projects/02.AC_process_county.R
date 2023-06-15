@@ -6,6 +6,15 @@
 # -----------------------------------------------------------------------------
 # Get some intial stuff set up 
 # -----------------------------------------------------------------------------
+library(tidyr)
+library(dplyr)
+library(stringr)
+
+#Define folders (variables) to extract 
+folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
+
+#Define set of years (ATUS years are 2003 onward)
+filter.years <- seq.int(2003,2022,1)
 
 #All gridmet files are on the same grid of lat and lons so grabbing one
 file.names <- list.files("inputs/data",recursive = T,pattern = ".nc",full.names = T)
@@ -47,17 +56,41 @@ bridge.county <- st_join(g.nc.coords,us_co,left=T) %>%
 
 
 # -----------------------------------------------------------------------------
-# Something with setting up file structure
+# Setting up nc files to process to parquet 
 # -----------------------------------------------------------------------------
 
 file.list <- expand.grid(folder.names,filter.years,stringsAsFactors = F) %>% 
   rename(var=Var1,year=Var2) %>%
   mutate(var=str_to_lower(var),
          file.name = str_c(var,"_",year,".nc")) %>% 
-  arrange(var) 
+  arrange(var) %>%
+  mutate(file.name_temp = str_remove(file.name, "\\.nc$"))
 
-file.list <- paste0("inputs/data/",file.list$var,"/",file.list$file.name)
+# check .nc files have already been processed to .parquet
+existing_files <- list.files("cache", full.names = TRUE, recursive = TRUE) %>%
+  as.data.frame() 
 
+existing_files$files <- existing_files$. 
+
+existing_files <- existing_files %>%
+  mutate(files = str_remove(files, "\\.parquet$")) %>%
+  mutate(existing_files = str_remove(files, "cache/.*/")) %>%
+  select(existing_files) %>%
+  mutate(file_exist = 1)
+
+file.list <- left_join(file.list, existing_files, by = c("file.name_temp" = "existing_files")) 
+
+file.list_final <- file.list %>%
+  filter(is.na(file_exist)) %>% # drop NAs
+  select(-file_exist, - file.name_temp)
+
+
+# CHECK IF NC FILE EXISTS YET 
+# next step
+
+
+
+file.list <- paste0("inputs/data/",file.list_final$var,"/",file.list_final$file.name) 
 
 fy = file.list[1]
 

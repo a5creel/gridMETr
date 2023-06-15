@@ -20,8 +20,8 @@
 folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 #Define set of years (ATUS years are 2003 onward)
-# filter.years <- seq.int(2003,2022,1) 
-filter.years <- seq.int(2021,2022,1)
+filter.years <- seq.int(2003,2022,1)
+# filter.years <- seq.int(2021,2022,1)
 
 
 # -----------------------------------------------------------------------------
@@ -31,4 +31,14 @@ filter.years <- seq.int(2021,2022,1)
 # puts all .nc data in inputs/data/ folders for each variable of interest
 gridmetr_download(variables = folder.names,
                   years = filter.years)
+
+
+
+
+
+download(url=str_c("http://www.northwestknowledge.net/metdata/data/pr_2003.nc"),
+         destfile = "inputs/data/pr/pr_2003.nc",
+         mode = 'wb', 
+         timeout = 180)
+
 

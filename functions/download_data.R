@@ -77,7 +77,8 @@ gridmetr_download <-
                   #Download the file
                   download(url=str_c("http://www.northwestknowledge.net/metdata/data/",file.list$file.name[x]),
                            destfile = target.file,
-                           mode = 'wb')
+                           mode = 'wb',
+                           timeout = 180) # AC: i changed this
                 }
               }
             )
