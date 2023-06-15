@@ -13,20 +13,8 @@ library(parallel)
 library(vroom)
 
 # -----------------------------------------------------------------------------
-# Read in data from other R project
+# Functions
 # -----------------------------------------------------------------------------
-
-#Define folders (variables) to extract 
-# folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
-folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn") #FOR NOW ONLY BC VS MISSING
-
-
-#Define set of years (ATUS years are 2003 onward)
-# filter.years <- seq.int(2003,2022,1)
-
-# Do it for one year
-results_list <- vector("list", length = length(folder.names))
-
 
 myGetParquetFiles <- function(i){
   
@@ -35,7 +23,9 @@ myGetParquetFiles <- function(i){
                               folder.names[i], 
                               "/",
                               folder.names[i],
-                              "_2022.parquet"))
+                              "_",
+                              year,
+                              ".parquet"))
   
   # cleaning
   temp <- as.data.frame(temp) %>%
@@ -47,29 +37,50 @@ myGetParquetFiles <- function(i){
   temp
 }
 
-# results_list <- mclapply(1:length(folder.names), myGetParquetFiles)
-# not running this in parallel bc it's already fast. 
-results_list <- lapply(1:length(folder.names), myGetParquetFiles)
+# -----------------------------------------------------------------------------
+# define variables and years
+# -----------------------------------------------------------------------------
+
+#Define folders (variables) to extract 
+folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 
-# Extract the common columns that you don't want to duplicate
-common_columns <- c("county", "date")
+#Define set of years (ATUS years are 2003 onward)
+myYears <- seq.int(2021,2022,1)
 
-# Combine the unique columns of the data frames
-final_df <- results_list %>%
-  purrr::map(select, -one_of(common_columns)) %>%
-  bind_cols()
+# -----------------------------------------------------------------------------
+# loop through each year, write final csv
+# -----------------------------------------------------------------------------
 
-# Add the common columns to the combined data frame
-final_df <- bind_cols(select(results_list[[1]], one_of(common_columns)), final_df)
+for (yr in myYears) {
 
-# write
-year <- 2022
-vroom_write(final_df, 
-            paste0("myOutput/", year, "_county_all.csv"), 
-            delim = ",")
+  year <- yr
+  
+  # Do it for one year
+  results_list <- vector("list", length = length(folder.names))
+  
+  # not running this in parallel bc it's already fast. 
+  results_list <- lapply(1:length(folder.names), myGetParquetFiles)
+  
+  
+  # Extract the common columns that you don't want to duplicate
+  common_columns <- c("county", "date")
+  
+  # Combine the unique columns of the data frames
+  final_df <- results_list %>%
+    purrr::map(select, -one_of(common_columns)) %>%
+    bind_cols()
+  
+  # Add the common columns to the combined data frame
+  final_df <- bind_cols(select(results_list[[1]], one_of(common_columns)), final_df)
+  
+  # write
+  vroom_write(final_df, 
+              paste0("myOutput/", year, "_county_all.csv"), 
+              delim = ",")
+
+}
 
 
-
-
-
+# test
+test <- vroom("myOutput/2021_county_all.csv")

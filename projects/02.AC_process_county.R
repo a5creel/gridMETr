@@ -59,6 +59,7 @@ bridge.county <- st_join(g.nc.coords,us_co,left=T) %>%
 # Setting up nc files to process to parquet 
 # -----------------------------------------------------------------------------
 
+#if all files were downloaded but not processed, this would be the file list
 file.list <- expand.grid(folder.names,filter.years,stringsAsFactors = F) %>% 
   rename(var=Var1,year=Var2) %>%
   mutate(var=str_to_lower(var),
@@ -80,19 +81,33 @@ existing_files <- existing_files %>%
 
 file.list <- left_join(file.list, existing_files, by = c("file.name_temp" = "existing_files")) 
 
-file.list_final <- file.list %>%
-  filter(is.na(file_exist)) %>% # drop NAs
-  select(-file_exist, - file.name_temp)
+file.list_1 <- file.list %>%
+  filter(is.na(file_exist)) %>% # keep NAs
+  select(-file_exist)
 
+# Check if .nc file is downloaded. 
+existing_nc <- list.files("inputs/data", full.names = TRUE, recursive = TRUE) %>%
+  as.data.frame() 
 
-# CHECK IF NC FILE EXISTS YET 
-# next step
+existing_nc$files <- existing_nc$. 
 
+existing_nc <- existing_nc %>%
+  mutate(files = str_remove(files, "\\.nc$")) %>%
+  mutate(existing_nc = str_remove(files, "inputs/data/.*/")) %>%
+  select(existing_nc) %>%
+  mutate(file_exist = 1)
 
+file.list_2 <- left_join(file.list_1, existing_nc, by = c("file.name_temp" = "existing_nc")) 
+
+file.list_final <- file.list_2 %>%
+  filter(!is.na(file_exist)) %>% # drop NAs
+  select(-file_exist, -file.name_temp)
 
 file.list <- paste0("inputs/data/",file.list_final$var,"/",file.list_final$file.name) 
 
 fy = file.list[1]
+
+rm(file.list_final, file.list_1, file.list_2)
 
 # -----------------------------------------------------------------------------
 # Begin loop over variables (folders)

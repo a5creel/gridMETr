@@ -7,8 +7,8 @@
 # Set up variables and years (from variable_reference.csv)
 # -----------------------------------------------------------------------------
 
-# These are the variables Iwant (it's not all of them)
-# pr: precipitation 
+# These are the variables I want (it's not all of them)
+# pr: precipitation
 # rmin: Minimum Near-Surface Relative Humidity
 # rmax: Maximum Near-Surface Relative Humidity
 # srad: Surface Downwelling Solar Radiation
