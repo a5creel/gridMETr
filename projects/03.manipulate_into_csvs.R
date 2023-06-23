@@ -46,7 +46,7 @@ folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 
 #Define set of years (ATUS years are 2003 onward)
-myYears <- seq.int(2021,2022,1)
+myYears <- seq.int(2003,2022,1)
 
 # -----------------------------------------------------------------------------
 # loop through each year, write final csv
