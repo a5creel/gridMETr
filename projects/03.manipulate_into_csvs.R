@@ -1,5 +1,5 @@
 # Goal: Do the third step of manipulating the gridmet data and storing as csvs
-# Prior to this script you must run project_init.R and 01.___.R
+# Prior to this script you must run project_init.R and 01.___.R and 02.__.R
 # Andie Creel modifying Jude Bayhams directory
 # Started June 13th, 2023
 
@@ -46,8 +46,8 @@ folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 
 #Define set of years (ATUS years are 2003 onward)
-myYears <- seq.int(2003,2022,1)
-
+# myYears <- seq.int(2003,2022,1)
+myYears <- 2023
 # -----------------------------------------------------------------------------
 # loop through each year, write final csv
 # -----------------------------------------------------------------------------
@@ -83,4 +83,4 @@ for (yr in myYears) {
 
 
 # test
-test <- vroom("myOutput/2021_county_all.csv")
+# test <- vroom("myOutput/2021_county_all.csv")

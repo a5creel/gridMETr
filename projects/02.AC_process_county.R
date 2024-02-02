@@ -14,7 +14,8 @@ library(stringr)
 folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 #Define set of years (ATUS years are 2003 onward)
-filter.years <- seq.int(2003,2022,1)
+# filter.years <- seq.int(2003,2022,1)
+filter.years <-2023
 
 #All gridmet files are on the same grid of lat and lons so grabbing one
 file.names <- list.files("inputs/data",recursive = T,pattern = ".nc",full.names = T)

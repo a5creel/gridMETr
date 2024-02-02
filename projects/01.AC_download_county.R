@@ -3,6 +3,9 @@
 # Andie Creel modifying Jude Bayhams directory
 # Started June 13th, 2023
 
+#ATTN Andie: I do this by hand at this website: 
+#     https://www.northwestknowledge.net/metdata/data/
+
 # -----------------------------------------------------------------------------
 # Set up variables and years (from variable_reference.csv)
 # -----------------------------------------------------------------------------
@@ -20,9 +23,9 @@
 folder.names <- c("pr","rmin","rmax","srad","tmmx","tmmn", "vs")
 
 #Define set of years (ATUS years are 2003 onward)
-filter.years <- seq.int(2003,2022,1)
+# filter.years <- seq.int(2003,2022,1)
 # filter.years <- seq.int(2021,2022,1)
-
+filter.years <- 2023
 
 # -----------------------------------------------------------------------------
 # Download gridmet data (only needs to be done once)
